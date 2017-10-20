@@ -143,11 +143,11 @@ TH1::SetDefaultSumw2();
 vxHist = fs->make<TH1D>("vxhist","offlinePrimaryVertices Vx Distribution", 100, -0.5, 0.5);
 vyHist = fs->make<TH1D>("vyhist","offlinePrimaryVertices Vy Distribution", 100, -0.5, 0.5);
 vzHist = fs->make<TH1D>("vzhist","offlinePrimaryVertices Vz Distribution", 120, -30., 30.);
-generalTracksHist = fs->make<TH1D>("generaltrackshist","generalTracks Distribution", 300, 0., 3000.);
+generalTracksHist = fs->make<TH1D>("generaltrackshist","generalTracks Distribution", 400, 0., 4000.);
 ptHist = fs->make<TH1D>("pthist","generalTracks pT Distribution", 100, 0., 10.);
 etaHist = fs->make<TH1D>("etahist","generalTracks eta Distribution", 120, -3.0, 3.0);
 phiHist = fs->make<TH1D>("phihist","generalTracks phi Distribution", 160, -4.0, 4.0);
-hHF = fs->make<TH1D>("hfhist","HF Distribution", 300, 0., 3000.);
+hHF = fs->make<TH1D>("hfhist","HF Distribution", 400, 0., 4000.);
 hHFplus = fs->make<TH1D>("hfplushist","HF Plus Distribution", 200, 0., 2000.);
 hHFminus = fs->make<TH1D>("hfminushist","HF Minus Distribution", 200, 0., 2000.);
 hetaVSphi = fs->make<TH2D>("hetavsphi","generalTracks phi VS eta", 120, -3.0, 3.0, 160, -4.0, 4.0);
@@ -155,10 +155,10 @@ hdzOerr = fs->make<TH1D>("hdzoerr","dz/dzErr", 100, 0., 10.);
 hd0Oerr = fs->make<TH1D>("hd0oerr","d0/d0Err", 100, 0., 10.);
 hpterrOpt = fs->make<TH1D>("hpterropt","p_{T}Err/p_{T}", 100, 0., 0.5);
 hCentralityBin = fs->make<TH1D>("hcentralitybin","XeXe centrality bin distribution", 201, 0., 201.0);
-hHFCentralityObject = fs->make<TH1D>("hhfcentralityobject","HF Distribution from centrality object", 300, 0., 3000.);
-hTrackCentralityObject = fs->make<TH1D>("htrackcentralityobject","NtrackOffline Distribution from centrality object", 200, 0., 2000.);
+hHFCentralityObject = fs->make<TH1D>("hhfcentralityobject","HF Distribution from centrality object", 400, 0., 4000.);
+hTrackCentralityObject = fs->make<TH1D>("htrackcentralityobject","NtrackOffline Distribution from centrality object", 400, 0., 4000.);
  for(int icent=0; icent<nCentBin; icent++){ 
-   hTrackDistribution[icent] = fs->make<TH1D>(Form("htrackdistribution_icent%d",icent),Form("Track Distribution in centrality bin%d",icent),200,0,2000);
+   hTrackDistribution[icent] = fs->make<TH1D>(Form("htrackdistribution_icent%d",icent),Form("Track Distribution in centrality bin%d",icent),400,0,4000);
  }
 
 }

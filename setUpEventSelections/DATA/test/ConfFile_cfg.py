@@ -4,9 +4,9 @@ process = cms.Process("Demo")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )
 #process.MessageLogger.cerr.FwkReport.reportEvery = 100
-process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True) )
+#process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use

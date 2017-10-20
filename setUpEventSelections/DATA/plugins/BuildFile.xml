@@ -4,6 +4,7 @@
 <use name="DataFormats/VertexReco"/>
 <use name="DataFormats/TrackReco"/>
 <use name="DataFormats/HcalRecHit"/>
+<use name="RecoHI/HiCentralityAlgos"/>
 <use name="root"/>
 <use name="FWCore/Common"/>
 <use name="CommonTools/UtilAlgos"/>

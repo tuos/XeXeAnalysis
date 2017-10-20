@@ -35,6 +35,7 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/HeavyIonEvent/interface/Centrality.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include <TH1.h>
@@ -44,6 +45,9 @@
 using namespace std;
 using namespace edm;
 using namespace reco;
+
+   const int nCentBin = 9;
+   double cBin[nCentBin+1]={0,10,20,30,40,50,60,70,80,100};
 
 //
 // class declaration
@@ -70,6 +74,8 @@ class XeXeAnalysis : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
       // ----------member data ---------------------------
    edm::Service<TFileService> fs;
+   edm::EDGetTokenT<reco::Centrality> CentralityTag_;
+   edm::EDGetTokenT<int> CentralityBinTag_;
    edm::EDGetTokenT<TrackCollection> srcTracks_;
    edm::EDGetTokenT<VertexCollection> srcVertex_;
    edm::EDGetTokenT<CaloTowerCollection> srcTower_;
@@ -96,6 +102,10 @@ class XeXeAnalysis : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
    TH1D* hdzOerr;
    TH1D* hd0Oerr;
    TH1D* hpterrOpt;
+   TH1D* hCentralityBin;
+   TH1D* hHFCentralityObject; 
+   TH1D* hTrackCentralityObject; 
+   TH1D* hTrackDistribution[nCentBin];
 };
 
 //
@@ -115,6 +125,8 @@ XeXeAnalysis::XeXeAnalysis(const edm::ParameterSet& iConfig)
    //now do what ever initialization is needed
    usesResource("TFileService");
 edm::Service<TFileService> fs;
+CentralityTag_ = consumes<reco::Centrality>(iConfig.getParameter<edm::InputTag>("CentralitySrc"));
+CentralityBinTag_= consumes<int>(iConfig.getParameter<edm::InputTag>("CentralityBinSrc"));
 srcTracks_ = consumes<TrackCollection>(iConfig.getParameter<edm::InputTag>("srcTracks"));
 srcVertex_ = consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("srcVertex"));
 srcTower_ = consumes<CaloTowerCollection>(iConfig.getParameter<edm::InputTag>("srcTower"));
@@ -131,17 +143,23 @@ TH1::SetDefaultSumw2();
 vxHist = fs->make<TH1D>("vxhist","offlinePrimaryVertices Vx Distribution", 100, -0.5, 0.5);
 vyHist = fs->make<TH1D>("vyhist","offlinePrimaryVertices Vy Distribution", 100, -0.5, 0.5);
 vzHist = fs->make<TH1D>("vzhist","offlinePrimaryVertices Vz Distribution", 120, -30., 30.);
-generalTracksHist = fs->make<TH1D>("generaltrackshist","generalTracks Distribution", 100, 0., 300.);
+generalTracksHist = fs->make<TH1D>("generaltrackshist","generalTracks Distribution", 300, 0., 3000.);
 ptHist = fs->make<TH1D>("pthist","generalTracks pT Distribution", 100, 0., 10.);
 etaHist = fs->make<TH1D>("etahist","generalTracks eta Distribution", 120, -3.0, 3.0);
 phiHist = fs->make<TH1D>("phihist","generalTracks phi Distribution", 160, -4.0, 4.0);
-hHF = fs->make<TH1D>("hfhist","HF Distribution", 200, 0., 200.);
-hHFplus = fs->make<TH1D>("hfplushist","HF Plus Distribution", 200, 0., 200.);
-hHFminus = fs->make<TH1D>("hfminushist","HF Minus Distribution", 200, 0., 200.);
+hHF = fs->make<TH1D>("hfhist","HF Distribution", 300, 0., 3000.);
+hHFplus = fs->make<TH1D>("hfplushist","HF Plus Distribution", 200, 0., 2000.);
+hHFminus = fs->make<TH1D>("hfminushist","HF Minus Distribution", 200, 0., 2000.);
 hetaVSphi = fs->make<TH2D>("hetavsphi","generalTracks phi VS eta", 120, -3.0, 3.0, 160, -4.0, 4.0);
 hdzOerr = fs->make<TH1D>("hdzoerr","dz/dzErr", 100, 0., 10.);
 hd0Oerr = fs->make<TH1D>("hd0oerr","d0/d0Err", 100, 0., 10.);
 hpterrOpt = fs->make<TH1D>("hpterropt","p_{T}Err/p_{T}", 100, 0., 0.5);
+hCentralityBin = fs->make<TH1D>("hcentralitybin","XeXe centrality bin distribution", 201, 0., 201.0);
+hHFCentralityObject = fs->make<TH1D>("hhfcentralityobject","HF Distribution from centrality object", 300, 0., 3000.);
+hTrackCentralityObject = fs->make<TH1D>("htrackcentralityobject","NtrackOffline Distribution from centrality object", 200, 0., 2000.);
+ for(int icent=0; icent<nCentBin; icent++){ 
+   hTrackDistribution[icent] = fs->make<TH1D>(Form("htrackdistribution_icent%d",icent),Form("Track Distribution in centrality bin%d",icent),200,0,2000);
+ }
 
 }
 
@@ -163,7 +181,23 @@ XeXeAnalysis::~XeXeAnalysis()
 void
 XeXeAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+//Centrality
+    edm::Handle<int> cbin_;
+    iEvent.getByToken(CentralityBinTag_,cbin_);
+    int hiBin = *cbin_;
+    hCentralityBin->Fill(hiBin);
+    edm::Handle<reco::Centrality> centrality;
+    iEvent.getByToken(CentralityTag_, centrality);
+    hHFCentralityObject->Fill(centrality->EtHFtowerSum());
+    hTrackCentralityObject->Fill(centrality->Ntracks());
+    int ibin=-1;
+    for(int j=0;j<nCentBin;j++)
+      if(hiBin>=2*cBin[j]&&hiBin<2*cBin[j+1])
+        ibin=j;
+    if(ibin<0 || ibin==nCentBin) return;
+    hTrackDistribution[ibin]->Fill(centrality->Ntracks());
 
+//HF
     double etHFtowerSumPlus = 0;
     double etHFtowerSumMinus = 0;
     double etHFtowerSum = 0;
@@ -185,6 +219,7 @@ XeXeAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     hHFplus->Fill(etHFtowerSumPlus);
     hHFminus->Fill(etHFtowerSumMinus);
 
+//Vertex
      double vx=-999.;
      double vy=-999.;
      double vz=-999.;
@@ -213,7 +248,7 @@ XeXeAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      vzHist->Fill(vz);
      math::XYZPoint v1(vx,vy, vz);
 
-
+//Track
      edm::Handle<TrackCollection> tracks;
      iEvent.getByToken(srcTracks_,tracks);
      int nTracks = 0;

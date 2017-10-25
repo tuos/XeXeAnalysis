@@ -12,9 +12,9 @@ config.Data.inputDBS = 'global'
 config.Data.lumiMask = 'Cert_304899-304906_XeXe_PromptReco_Collisions17_JSON.txt'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 2
-config.Data.outLFNDirBase = '/store/user/tuos/XeXe/Flow/TestCentralityRun/v01Test_Cent_oct20'
+config.Data.outLFNDirBase = '/store/user/tuos/XeXe/Flow/TestCentralityRun/v01Test_Cent_oct25'
 config.Data.publication = False
-config.Data.outputDatasetTag = 'xexe2017_flowcorr_HIMinimumBias1_v01Test_Cent_oct20'
+config.Data.outputDatasetTag = 'xexe2017_flowcorr_HIMinimumBias1_v01Test_Cent_oct25'
 
 config.Site.storageSite = 'T2_US_Vanderbilt'
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
    from CRABClient.ClientExceptions import ClientException
    from httplib import HTTPException
 
-   config.General.workArea = 'xexe2017_flowcorr_HIMinimumBias1_v01Test_Cent_oct20'
+   config.General.workArea = 'xexe2017_flowcorr_HIMinimumBias1_v01Test_Cent_oct25'
 
    def submit(config):
       try:
@@ -37,8 +37,8 @@ if __name__ == '__main__':
 
        print "Submitting Data Set %d " % (num+1)
 
-       RequestName = 'xexe2017_flowcorr_HIMinimumBias%d_v04Ana_5TevCentNoRecPt_oct16' % (num+1)
-       DataSetName = '/HIMinimumBias%d/HIRun2015-25Aug2016-v1/AOD' % (num+1)
+       RequestName = 'xexe2017_flowcorr_HIMinimumBias%d_v01Test_Cent_oct25' % (num+1)
+       DataSetName = '/HIMinimumBias%d/XeXeRun2017-PromptReco-v1/AOD' % (num+1)
            
        config.General.requestName = RequestName
        config.Data.inputDataset = DataSetName

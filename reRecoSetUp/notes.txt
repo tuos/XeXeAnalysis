@@ -1,0 +1,100 @@
+
+Because 'jetHighLevelReco' is not in the 'reconstruction_standard_candle' sequence, I decided to move all my changes from 'RecoJets/Configuration' to 'RecoEgamma/Configuration'. 
+
+=================================
+git cms-addpkg RecoEgamma/Configuration
+git checkout -b rerecoXeXev4
+
+vi RecoEgamma/Configuration/python/RecoEgamma_cff.py
+
+Make changes, 
+
+from
+============
+from RecoHI.HiEgammaAlgos.photonIsolationHIProducer_cfi import photonIsolationHIProducerpp
+from RecoHI.HiEgammaAlgos.photonIsolationHIProducer_cfi import photonIsolationHIProducerppGED
+from RecoHI.HiEgammaAlgos.photonIsolationHIProducer_cfi import photonIsolationHIProducerppIsland
+
+_egammaHighLevelRecoPostPF_HI = egammaHighLevelRecoPostPF.copy()
+_egammaHighLevelRecoPostPF_HI += photonIsolationHIProducerpp
+_egammaHighLevelRecoPostPF_HI += photonIsolationHIProducerppGED
+_egammaHighLevelRecoPostPF_HI += photonIsolationHIProducerppIsland
+for e in [pA_2016, peripheralPbPb, pp_on_XeXe_2017, ppRef_2017]:
+    e.toReplaceWith(egammaHighLevelRecoPostPF, _egammaHighLevelRecoPostPF_HI)
+============
+
+to 
+============
+from RecoHI.HiEgammaAlgos.photonIsolationHIProducer_cfi import photonIsolationHIProducerpp
+from RecoHI.HiEgammaAlgos.photonIsolationHIProducer_cfi import photonIsolationHIProducerppGED
+from RecoHI.HiEgammaAlgos.photonIsolationHIProducer_cfi import photonIsolationHIProducerppIsland
+from RecoHI.HiCentralityAlgos.HiCentrality_cfi import hiCentrality
+from RecoHI.HiCentralityAlgos.HiClusterCompatibility_cfi import hiClusterCompatibility
+pp_on_XeXe_2017.toModify(hiCentrality,
+                         producePixelTracks = False,
+                         srcTracks = cms.InputTag("generalTracks"),
+                         srcVertex = cms.InputTag("offlinePrimaryVertices")
+                         )
+
+_egammaHighLevelRecoPostPF_HI = egammaHighLevelRecoPostPF.copy()
+_egammaHighLevelRecoPostPF_HI += photonIsolationHIProducerpp
+_egammaHighLevelRecoPostPF_HI += photonIsolationHIProducerppGED
+_egammaHighLevelRecoPostPF_HI += photonIsolationHIProducerppIsland
+_egammaHighLevelRecoPostPF_HI += hiCentrality
+_egammaHighLevelRecoPostPF_HI += hiClusterCompatibility
+for e in [pA_2016, peripheralPbPb, pp_on_XeXe_2017, ppRef_2017]:
+    e.toReplaceWith(egammaHighLevelRecoPostPF, _egammaHighLevelRecoPostPF_HI)
+=============
+
+
+vi RecoEgamma/Configuration/python/RecoEgamma_EventContent_cff.py
+
+Make changes, 
+
+from
+============
+        e.toModify( ec, func=lambda outputCommands: outputCommands.extend(['keep recoHIPhotonIsolationedmValueMap_photonIsolationHIProducerppGED_*_*',
+                                                                           'keep recoHIPhotonIsolationedmValueMap_photonIsolationHIProducerpp_*_*',
+                                                                           'keep recoHIPhotonIsolationedmValueMap_photonIsolationHIProducerppIsland_*_*',
+                                                                           'keep recoPhotons_islandPhotons_*_*'
+                                                                           ])
+                    )
+============
+
+to 
+============
+        e.toModify( ec, func=lambda outputCommands: outputCommands.extend(['keep recoHIPhotonIsolationedmValueMap_photonIsolationHIProducerppGED_*_*',
+                                                                           'keep recoHIPhotonIsolationedmValueMap_photonIsolationHIProducerpp_*_*',
+                                                                           'keep recoHIPhotonIsolationedmValueMap_photonIsolationHIProducerppIsland_*_*',
+                                                                           'keep recoPhotons_islandPhotons_*_*',
+                                                                           'keep recoCentrality*_hiCentrality_*_*',
+                                                                           'keep recoClusterCompatibility*_hiClusterCompatibility_*_*'
+                                                                           ])
+                    )
+=============
+
+
+git add .
+git commit -m "Adding hiCentrality and hiClusterCompatibility for XeXe re-reco"
+git push my-cmssw rerecoXeXev4
+
+
+in src/
+scram b distclean 
+git cms-checkdeps -a
+scram b -j 8
+scram b runtests
+
+runTheMatrix.py -l 148
+
+In step3.root, the objects are created:
+reco::Centrality                      "hiCentrality"              ""                "RECO"
+reco::ClusterCompatibility            "hiClusterCompatibility"    ""                "RECO"
+
+PR: https://github.com/cms-sw/cmssw/pull/21210
+===
+Produce and keep the hiCentrality and hiClusterCompatibility objects
+To be used for XeXe re-reco
+===
+
+

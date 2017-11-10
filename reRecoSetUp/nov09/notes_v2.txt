@@ -1,0 +1,64 @@
+
+cmsrel CMSSW_10_0_X_2017-11-09-1100
+cd CMSSW_10_0_X_2017-11-09-1100/src/
+cmsenv
+git cms-merge-topic -u tuos:rerecoXeXev4
+git remote add tuos git@github.com:tuos/cmssw.git
+git fetch tuos
+git checkout -b rerecoXeXev4 remotes/tuos/rerecoXeXev4
+git cms-addpkg RecoJets/Configuration
+git cms-addpkg RecoHI/HiCentralityAlgos
+git cms-addpkg Configuration/StandardSequences
+
+vi RecoHI/HiCentralityAlgos/python/HiCentrality_cfi.py
+===
+from Configuration.Eras.Modifier_pp_on_XeXe_2017_cff import pp_on_XeXe_2017
+pp_on_XeXe_2017.toModify(hiCentrality,
+                         producePixelTracks = False,
+                         srcTracks = cms.InputTag("generalTracks"),
+                         srcVertex = cms.InputTag("offlinePrimaryVertices")
+                         )
+===
+vi Configuration/StandardSequences/python/Reconstruction_cff.py
+===
+from Configuration.Eras.Modifier_pp_on_XeXe_2017_cff import pp_on_XeXe_2017
+from RecoHI.HiCentralityAlgos.HiCentrality_cfi import hiCentrality
+from RecoHI.HiCentralityAlgos.HiClusterCompatibility_cfi import hiClusterCompatibility
+_highlevelreco_HI = highlevelreco.copy()
+_highlevelreco_HI += hiCentrality
+_highlevelreco_HI += hiClusterCompatibility
+pp_on_XeXe_2017.toReplaceWith(highlevelreco, _highlevelreco_HI)
+===
+vi RecoJets/Configuration/python/RecoJets_EventContent_cff.py
+===
+for ec in [RecoJetsAOD.outputCommands, RecoJetsRECO.outputCommands, RecoJetsFEVT.outputCommands]:
+    pp_on_XeXe_2017.toModify( ec,
+                              func=lambda outputCommands: outputCommands.extend(['keep recoCentrality*_hiCentrality_*_*',
+                                                                                 'keep recoClusterCompatibility*_hiClusterCompatibility_*_*'
+                                                                                 ])
+                              )
+===
+vi RecoEgamma/Configuration/python/RecoEgamma_cff.py
+Deleted centrality related.
+vi RecoEgamma/Configuration/python/RecoEgamma_EventContent_cff.py
+Deleted centrality related.
+===
+
+scram b distclean 
+scram b -j 8
+scram b runtests
+runTheMatrix.py -l 148
+===
+Working? Collection produced and saved?
+===
+rm -rf 148*
+rm runall*
+scram b distclean 
+git add .
+git commit -m “Move changes from RecoEgamma/Configuration to RecoHI/HiCentralityAlgos; reco sequence moved to highlevelreco sequence of /Configuration/StandardSequences/python/Reconstruction_cff.py“
+git push my-cmssw rerecoXeXev4:rerecoXeXev4
+
+
+
+
+

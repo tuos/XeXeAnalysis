@@ -1,0 +1,90 @@
+
+export SCRAM_ARCH=slc6_amd64_gcc630
+scram list CMSSW
+cmsrel CMSSW_9_4_X_2017-11-10-2300
+cd CMSSW_9_4_X_2017-11-10-2300/src/
+cmsenv
+git cms-addpkg RecoJets/Configuration
+git cms-addpkg RecoHI/HiCentralityAlgos
+git cms-addpkg Configuration/StandardSequences
+git checkout -b rerecoXeXe_94X
+vi RecoHI/HiCentralityAlgos/python/HiCentrality_cfi.py
+===
+from Configuration.Eras.Modifier_pp_on_XeXe_2017_cff import pp_on_XeXe_2017
+pp_on_XeXe_2017.toModify(hiCentrality,
+                         producePixelTracks = False,
+                         srcTracks = cms.InputTag("generalTracks"),
+                         srcVertex = cms.InputTag("offlinePrimaryVertices")
+                         )
+===
+vi Configuration/StandardSequences/python/Reconstruction_cff.py
+===
+# XeXe data with pp reco
+from Configuration.Eras.Modifier_pp_on_XeXe_2017_cff import pp_on_XeXe_2017
+from RecoHI.HiCentralityAlgos.HiCentrality_cfi import hiCentrality
+from RecoHI.HiCentralityAlgos.HiClusterCompatibility_cfi import hiClusterCompatibility
+_highlevelreco_HI = highlevelreco.copy()
+_highlevelreco_HI += hiCentrality
+_highlevelreco_HI += hiClusterCompatibility
+pp_on_XeXe_2017.toReplaceWith(highlevelreco, _highlevelreco_HI)
+===
+vi RecoJets/Configuration/python/RecoJets_EventContent_cff.py
+===
+for ec in [RecoJetsAOD.outputCommands, RecoJetsRECO.outputCommands, RecoJetsFEVT.outputCommands]:
+    pp_on_XeXe_2017.toModify( ec,
+                              func=lambda outputCommands: outputCommands.extend(['keep recoCentrality*_hiCentrality_*_*',
+                                                                                 'keep recoClusterCompatibility*_hiClusterCompatibility_*_*'
+                                                                                 ])
+                              )
+===
+scram b distclean 
+scram b -j 8
+scram b runtests
+runTheMatrix.py -l 148
+===
+Working? Collection produced and saved?
+===
+rm -rf 148*
+rm runall*
+scram b distclean 
+git cms-checkdeps -a  (see if there is a conflict before committing. This could avoid rebase later after the commit)
+git status  (Don’t see conflicts)
+scram b distclean 
+git add .
+git commit -m “Adding hiCentrality and hiClusterCompatibility for XeXe re-reco“
+git push my-cmssw rerecoXeXe  (failed!) 
+git branch
+git checkout -b rerecoXeXe_94X
+git branch
+git status (showing nothing)
+git checkout rerecoXeXe
+git branch
+git status (still showing nothing?)
+
+================
+================
+Setup a new working area. Name the branch to be: ‘rerecoXeXe_94X’ 
+Do all the edits
+===
+git cms-checkdeps -a
+git status
+scram b distclean 
+git add .
+git commit -m “Adding hiCentrality and hiClusterCompatibility for XeXe re-reco“ (write “” in the terminal, don’t copy “”, could have problems when committing)
+git push my-cmssw rerecoXeXe_94X
+===
+
+When producing the PR for backporting, BE CAREFUL, selection the correct branch to accept the backport (to be backported), in this case, choose: ‘cms-sw:CMSSW_9_4_X’ (make a PR into the 9_4_X queue, test is with the relevant relval workflow [148], Start from the most recent IB, and port your changes there)  
+PR: “Backport of #21210”, “Produce and keep the hiCentrality and hiClusterCompatibility objects”, “To be used for XeXe re-reco”
+
+
+
+
+
+
+
+
+
+
+
+

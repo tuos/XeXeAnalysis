@@ -15,7 +15,7 @@ void getCentNpartNcollXerw(){
   TH1D *hNcoll = new TH1D("hNcoll","Number of Binary Collision Distribution;Ncoll;Events",1500,-0.5,1499.5);
   nt_Xerw_Xerw->Project("hNcoll","Ncoll");
   //TH1D *hB = new TH1D("hB","Number of Participants Distribution;B;Events",200000000,-0.01,19.99);
-  TH1D *hB = new TH1D("hB","Number of Participants Distribution;B;Events",2000000,-0.01,19.99);
+  TH1D *hB = new TH1D("hB","Number of Participants Distribution;B;Events",2000000,-0.01,19.99);  //200000000
   nt_Xerw_Xerw->Project("hB","B");
 
   // Extract hNpart distribution and get bin boundaries for three centralit bins
@@ -32,6 +32,7 @@ void getCentNpartNcollXerw(){
   Int_t iBin60=0;
   Int_t iBin70=0;
   Int_t iBin80=0;
+  Int_t iBin90=0;
   Int_t iBin100=1;
 
 cout << fixed << setprecision(10);
@@ -83,6 +84,10 @@ cout << fixed << setprecision(10);
     if(fRunningCounts>=(0.8*hB->GetEntries())&&iBin80==0) {
       iBin80=i;
       cout<<"Found 80% bin boundary="<<iBin80<<", B value = "<<hB->GetBinCenter(iBin80)<<endl;
+    }
+    if(fRunningCounts>=(0.9*hB->GetEntries())&&iBin90==0) {
+      iBin90=i;
+      cout<<"Found 90% bin boundary="<<iBin90<<", B value = "<<hB->GetBinCenter(iBin90)<<endl;
     }
     //if(fRunningCounts>=(1.0*hB->GetEntries())&&iBin100==0) {
       //iBin100=i;
@@ -138,6 +143,13 @@ cout << fixed << setprecision(10);
   TH1D *hNpart0100 = new TH1D("hNpart0100","Number of Participants Distribution;Npart;Events",300,-0.5,299.5);
   nt_Xerw_Xerw->Draw("Npart>>+hNpart0100","B>=0.0&&B<100.0");
 
+  TH1D *hNpart5070 = new TH1D("hNpart5070","Number of Participants Distribution;Npart;Events",300,-0.5,299.5);
+  nt_Xerw_Xerw->Draw("Npart>>+hNpart5070","B>=9.4719390500&&B<11.2045402500");
+  TH1D *hNpart7090 = new TH1D("hNpart7090","Number of Participants Distribution;Npart;Events",300,-0.5,299.5);
+  nt_Xerw_Xerw->Draw("Npart>>+hNpart7090","B>=11.2045402500&&B<12.9329948500");
+  TH1D *hNpart5090 = new TH1D("hNpart5090","Number of Participants Distribution;Npart;Events",300,-0.5,299.5);
+  nt_Xerw_Xerw->Draw("Npart>>+hNpart5090","B>=9.4719390500&&B<12.9329948500");
+
   TH1D *hNcoll05 = new TH1D("hNcoll05","Number of Participants Distribution;Ncoll;Events",1500,-0.5,1499.5);
   nt_Xerw_Xerw->Draw("Ncoll>>+hNcoll05","B<2.9989798500");
   TH1D *hNcoll10 = new TH1D("hNcoll10","Number of Participants Distribution;Ncoll;Events",1500,-0.5,1499.5);
@@ -174,6 +186,14 @@ cout << fixed << setprecision(10);
   TH1D *hNcoll0100 = new TH1D("hNcoll0100","Number of Participants Distribution;Ncoll;Events",1500,-0.5,1499.5);
   nt_Xerw_Xerw->Draw("Ncoll>>+hNcoll0100","B>=0.0&&B<100.0");
 
+  TH1D *hNcoll5070 = new TH1D("hNcoll5070","Number of Participants Distribution;Ncoll;Events",1500,-0.5,1499.5);
+  nt_Xerw_Xerw->Draw("Ncoll>>+hNcoll5070","B>=9.4719390500&&B<11.2045402500");
+  TH1D *hNcoll7090 = new TH1D("hNcoll7090","Number of Participants Distribution;Ncoll;Events",1500,-0.5,1499.5);
+  nt_Xerw_Xerw->Draw("Ncoll>>+hNcoll7090","B>=11.2045402500&&B<12.9329948500");
+  TH1D *hNcoll5090 = new TH1D("hNcoll5090","Number of Participants Distribution;Ncoll;Events",1500,-0.5,1499.5);
+  nt_Xerw_Xerw->Draw("Ncoll>>+hNcoll5090","B>=9.4719390500&&B<12.9329948500");
+  
+
 cout << fixed << setprecision(2);
 //cout<<hNpart05->GetMean()<<"  "<<hNpart10->GetMean()<<"  "<<hNpart15->GetMean()<<endl;
 //cout<<hNpart05->GetMean()<<"  "<<hNpart10->GetMean()<<"  "<<hNpart15->GetMean()<<endl;
@@ -196,6 +216,9 @@ cout<<" 10-30%    "<<hNpart1030->GetMean()<<"   "<<hNcoll1030->GetMean()<<"   "<
 cout<<" 30-50%    "<<hNpart3050->GetMean()<<"   "<<hNcoll3050->GetMean()<<"   "<<hNcoll3050->GetMean()/68.4<<endl;
 cout<<" 50-100%    "<<hNpart50100->GetMean()<<"   "<<hNcoll50100->GetMean()<<"   "<<hNcoll50100->GetMean()/68.4<<endl;
 cout<<" 0-100%    "<<hNpart0100->GetMean()<<"   "<<hNcoll0100->GetMean()<<"   "<<hNcoll0100->GetMean()/68.4<<endl;
+cout<<" 50-70%    "<<hNpart5070->GetMean()<<"   "<<hNcoll5070->GetMean()<<"   "<<hNcoll5070->GetMean()/68.4<<endl;
+cout<<" 70-90%    "<<hNpart7090->GetMean()<<"   "<<hNcoll7090->GetMean()<<"   "<<hNcoll7090->GetMean()/68.4<<endl;
+cout<<" 50-90%    "<<hNpart5090->GetMean()<<"   "<<hNcoll5090->GetMean()<<"   "<<hNcoll5090->GetMean()/68.4<<endl;
 
 printf("%d - %d   %.4g   %.4g   %.3g\n",cent[0],cent[1],hNpart05->GetMean(),hNcoll05->GetMean(),hNcoll05->GetMean()/68.4);
 printf("%d - %d   %.4g   %.4g   %.3g\n",cent[1],cent[2],hNpart10->GetMean(),hNcoll10->GetMean(),hNcoll10->GetMean()/68.4);
@@ -214,6 +237,9 @@ printf("10-30  %.4g   %.4g   %.3g\n",hNpart1030->GetMean(),hNcoll1030->GetMean()
 printf("30-50  %.4g   %.4g   %.3g\n",hNpart3050->GetMean(),hNcoll3050->GetMean(),hNcoll3050->GetMean()/68.4);
 printf("50-100  %.4g   %.4g   %.3g\n",hNpart50100->GetMean(),hNcoll50100->GetMean(),hNcoll50100->GetMean()/68.4);
 printf("0-100  %.4g   %.4g   %.3g\n",hNpart0100->GetMean(),hNcoll0100->GetMean(),hNcoll0100->GetMean()/68.4);
+printf("50-70  %.4g   %.4g   %.3g\n",hNpart5070->GetMean(),hNcoll5070->GetMean(),hNcoll5070->GetMean()/68.4);
+printf("70-90  %.4g   %.4g   %.3g\n",hNpart7090->GetMean(),hNcoll7090->GetMean(),hNcoll7090->GetMean()/68.4);
+printf("50-90  %.4g   %.4g   %.3g\n",hNpart5090->GetMean(),hNcoll5090->GetMean(),hNcoll5090->GetMean()/68.4);
 
 cout << fixed << setprecision(3);
 
@@ -279,6 +305,31 @@ printf("%d   %.3g | %.3g | %.3g | %.3g\n",i,hEcc25[i]->GetMean(),hEcc35[i]->GetM
   cout<<"0-100%   "<<hEcc20->GetMean()<<" | "<<hEcc30->GetMean()<<" | "<<hEcc40->GetMean()<<" | "<<hEcc50->GetMean()<<endl;
 
 printf("0-100   %.3g | %.3g | %.3g | %.3g\n",hEcc20->GetMean(),hEcc30->GetMean(),hEcc40->GetMean(),hEcc50->GetMean());
+
+//Three new centrality ranges
+const int nCent3=3;
+double bRanges3[nCent3+nCent3]={9.4719390500, 11.2045402500, 9.4719390500,  11.2045402500, 12.9329948500, 12.9329948500};
+
+  TH1D *hEcc23[nCent3];
+  TH1D *hEcc33[nCent3];
+  TH1D *hEcc43[nCent3];
+  TH1D *hEcc53[nCent3];
+for(int i=0; i<nCent3; i++){
+  hEcc23[i] = new TH1D(Form("hEcc23_%d", i),"Ecc Distribution;Ecc;Events",1100,-0.05,1.05);
+  hEcc33[i] = new TH1D(Form("hEcc33_%d", i),"Ecc Distribution;Ecc;Events",1100,-0.05,1.05);
+  hEcc43[i] = new TH1D(Form("hEcc43_%d", i),"Ecc Distribution;Ecc;Events",1100,-0.05,1.05);
+  hEcc53[i] = new TH1D(Form("hEcc53_%d", i),"Ecc Distribution;Ecc;Events",1100,-0.05,1.05);
+
+  nt_Xerw_Xerw->Draw(Form("Ecc2>>+hEcc23_%d",i),Form("B>=%f&&B<%f", bRanges3[i],bRanges3[i+nCent3]));
+  nt_Xerw_Xerw->Draw(Form("Ecc3>>+hEcc33_%d",i),Form("B>=%f&&B<%f", bRanges3[i],bRanges3[i+nCent3]));
+  nt_Xerw_Xerw->Draw(Form("Ecc4>>+hEcc43_%d",i),Form("B>=%f&&B<%f", bRanges3[i],bRanges3[i+nCent3]));
+  nt_Xerw_Xerw->Draw(Form("Ecc5>>+hEcc53_%d",i),Form("B>=%f&&B<%f", bRanges3[i],bRanges3[i+nCent3]));
+
+  cout<<i<<"   "<<hEcc23[i]->GetMean()<<" | "<<hEcc33[i]->GetMean()<<" | "<<hEcc43[i]->GetMean()<<" | "<<hEcc53[i]->GetMean()<<endl;
+
+printf("%d   %.3g | %.3g | %.3g | %.3g\n",i,hEcc23[i]->GetMean(),hEcc33[i]->GetMean(),hEcc43[i]->GetMean(),hEcc53[i]->GetMean());
+
+}
 
 cout<<endl<<hEcc25[0]->GetMean()<<endl;
 hEcc25[0]->Draw();
